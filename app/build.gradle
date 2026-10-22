@@ -1,0 +1,29 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.minecrafttotal.game'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.minecrafttotal.game'
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+    buildTypes { release { minifyEnabled false } }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
+
+dependencies { implementation 'androidx.webkit:webkit:1.11.0' }
+
+// Baixa o three.js (r128) para dentro do APK -> o jogo roda 100% offline.
+tasks.register('downloadThree') {
+    doLast {
+        def f = file('src/main/assets/three.min.js')
+        if (!f.exists() || f.length() < 100000) {
+            f.parentFile.mkdirs()
+            new URL('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js').withInputStream { i -> f.withOutputStream { it << i } }
+        }
+    }
+}
+tasks.configureEach { t -> if (t.name == 'preBuild') t.dependsOn 'downloadThree' }
