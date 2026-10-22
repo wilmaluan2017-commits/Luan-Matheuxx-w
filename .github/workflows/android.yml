@@ -25,6 +25,8 @@ jobs:
           cd MinecraftTotal && chmod +x gradlew
         elif [ -f "MinecraftTotal (1)/gradlew" ]; then
           cd "MinecraftTotal (1)" && chmod +x gradlew
+        else
+          echo "Erro: gradlew nao encontrado" && exit 1
         fi
 
     - name: Build with Gradle
@@ -35,6 +37,8 @@ jobs:
           cd MinecraftTotal && ./gradlew assembleDebug
         elif [ -f "MinecraftTotal (1)/gradlew" ]; then
           cd "MinecraftTotal (1)" && ./gradlew assembleDebug
+        else
+          echo "Erro: Diretorio Gradle invalido" && exit 1
         fi
 
     - name: Upload APK
