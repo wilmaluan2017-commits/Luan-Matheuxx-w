@@ -17,29 +17,19 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Grant execute permission for gradlew
+    - name: Find Gradlew and Build APK
       run: |
-        if [ -f "gradlew" ]; then
-          chmod +x gradlew
-        elif [ -f "MinecraftTotal/gradlew" ]; then
-          cd MinecraftTotal && chmod +x gradlew
-        elif [ -f "MinecraftTotal (1)/gradlew" ]; then
-          cd "MinecraftTotal (1)" && chmod +x gradlew
-        else
-          echo "Erro: gradlew nao encontrado" && exit 1
+        GRADLEW_PATH=$(find . -name gradlew -print -quit)
+        if [ -z "$GRADLEW_PATH" ]; then
+          echo "Erro crítico: O arquivo gradlew nao existe no seu repositorio!"
+          exit 1
         fi
-
-    - name: Build with Gradle
-      run: |
-        if [ -f "gradlew" ]; then
-          ./gradlew assembleDebug
-        elif [ -f "MinecraftTotal/gradlew" ]; then
-          cd MinecraftTotal && ./gradlew assembleDebug
-        elif [ -f "MinecraftTotal (1)/gradlew" ]; then
-          cd "MinecraftTotal (1)" && ./gradlew assembleDebug
-        else
-          echo "Erro: Diretorio Gradle invalido" && exit 1
-        fi
+        
+        GRADLE_DIR=$(dirname "$GRADLEW_PATH")
+        echo "Gradle encontrado em: $GRADLE_DIR"
+        cd "$GRADLE_DIR"
+        chmod +x gradlew
+        ./gradlew assembleDebug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
@@ -47,3 +37,4 @@ jobs:
         name: MinecraftTotal-debug-apk
         path: |
           **/build/outputs/apk/debug/*.apk
+
